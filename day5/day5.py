@@ -1,24 +1,19 @@
 import os
 import portion as P
 
-def solve(fresh, ingredients):
-    FRESH = [range(a,b+1) for a,b in (list(map(int,f.split("-"))) for f in fresh)]
+def solve(intervals, ingredients):
     f=0
     for ingredient in ingredients:
-        for fresh_range in FRESH:
-            if int(ingredient) in fresh_range:
+        for interval in intervals:
+            if int(ingredient) in interval:
                 f+=1
                 break
     
     return f
 
-def solve2(fresh):
-    
-    merged = P.closed
-    FRESH_intervals = [P.closed(int(a),int(b)) for a,b in [f.split("-") for f in fresh]]
-    
+def solve2(intervals):
     merged = P.empty()
-    for interval in FRESH_intervals:
+    for interval in intervals:
         merged = merged | interval
 
     fresh_articles=0
@@ -38,12 +33,12 @@ def main(test):
 
     #
     idx = lines.index("")
-    fresh = lines[:idx]
+    intervals = [P.closed(int(a),int(b)) for a,b in [interval.split("-") for interval in lines[:idx]]]
     ingredients = lines[idx+1:]
   
-    result = solve(fresh, ingredients)
+    result = solve(intervals, ingredients)
     print(f"The result 1 is {result}.")
-    result = solve2(fresh)
+    result = solve2(intervals)
     print(f"The result 2 is {result}.")
     # 
 
