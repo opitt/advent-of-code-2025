@@ -1,24 +1,30 @@
 import os
 import re
+import math
 
 def solve(numbers, operators):
+    numbers = [list(map(int, re.sub(" +"," ",line).strip(" ").split(" "))) for line in numbers]
+    operators = re.sub(" +"," ",operators).strip(" ").split(" ")
     result = 0
-    numbers = [list(map(int, line.split(" "))) for line in numbers]
     for col in range(len(numbers[0])):
         op = operators[col]
-        if op=="+":
-            colvalue = 0
-        elif op == "*":
-            colvalue = 1
-        for row in range(len(numbers)):
-            if op=="+":
-                colvalue += numbers[row][col]
-            elif op == "*":
-                colvalue *= numbers[row][col]
+        operands = [numbers[row][col] for row in range(len(numbers))]
+        colvalue = sum(operands) if op=="+" else math.prod(operands)
         result += colvalue
-
     return result
 
+def solve2(numbers, operators):
+    operator_matches = re.finditer(r"([*+] +)",operators)
+    result = 0
+    for match in operator_matches:
+        idx1, idx2 = match.span()
+        op = match.group()[0]
+        operands = []
+        for col in range(idx1,idx2):
+            number = "".join(numbers[row][col] for row in range(len(numbers))).strip()
+            if number: operands.append(int(number))
+        result += sum(operands) if op == "+" else math.prod(operands)
+    return result
 
 def main(test):
     # READ INPUT FILE
@@ -27,17 +33,17 @@ def main(test):
         os.path.join(script_path, "test.txt" if test else "input.txt"), encoding="utf-8"
     ) as input:
         lines = input.readlines()
-    lines = list(map(str.strip, lines))
+    lines = [line.strip("\n") for line in lines]
 
     #
-    lines = [re.sub(" +"," ",line).strip(" ") for line in lines]
     numbers = lines[:-1]
-    operators = lines[-1].split(" ")
+    operators = lines[-1]
 
     result = solve(numbers,operators)
     print(f"The result 1 is {result}.")
-    #result = solve2(lines)
-    #print(f"The result 2 is {result}.")
+
+    result = solve2(numbers, operators)
+    print(f"The result 2 is {result}.")
     # 
 
 
